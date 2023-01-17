@@ -24,6 +24,7 @@ from launch.conditions import LaunchConfigurationEquals
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 
 from launch_ros.actions import Node
+from launch_ros.actions import PushRosNamespace
 
 
 ARGUMENTS = [
@@ -39,6 +40,10 @@ ARGUMENTS = [
 def generate_launch_description():
 
     pkg_turtlebot4_bringup = get_package_share_directory('turtlebot4_bringup')
+
+    ## Adding namespace option
+    namespace ="barista_id"
+    
 
     param_file_cmd = DeclareLaunchArgument(
         'param_file',
@@ -63,6 +68,20 @@ def generate_launch_description():
         output='screen',
         condition=LaunchConfigurationEquals('model', 'standard')
     )
+    ## Adding namespace option
+    grouped_nodes = GroupAction(
+            actions=[
+                PushRosNamespace(namespace),
+                turtlebot4_node,
+                turtlebot4_base_node
+            ]
+        )
+    return LaunchDescription([ 
+        ARGUMENTS,
+        param_file_cmd,
+        grouped_nodes
+    ])
+
 
     ld = LaunchDescription(ARGUMENTS)
     ld.add_action(param_file_cmd)
