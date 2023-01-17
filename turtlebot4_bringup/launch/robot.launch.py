@@ -26,7 +26,6 @@ from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 
 
-
 ARGUMENTS = [
     DeclareLaunchArgument('use_sim', default_value='false',
                           choices=['true', 'false'],
@@ -41,9 +40,8 @@ def generate_launch_description():
 
     pkg_turtlebot4_bringup = get_package_share_directory('turtlebot4_bringup')
 
-    ## Adding namespace option
-    NAMESPACE ="barista_id"
-    
+    # Adding namespace option
+    NAMESPACE = "barista_id"
 
     param_file_cmd = DeclareLaunchArgument(
         'param_file',
@@ -60,7 +58,8 @@ def generate_launch_description():
         namespace=NAMESPACE,
         parameters=[turtlebot4_param_yaml_file,
                     {'model': LaunchConfiguration('model')}],
-        output='screen')
+        output='screen'
+    )
 
     turtlebot4_base_node = Node(
         package='turtlebot4_base',
@@ -71,8 +70,23 @@ def generate_launch_description():
         condition=LaunchConfigurationEquals('model', 'standard')
     )
 
+    rplidar_node = Node(
+        name='rplidar_composition',
+        package='rplidar_ros',
+        executable='rplidar_composition',
+        namespace=NAMESPACE,
+        output='screen',
+        parameters=[{
+                'serial_port': '/dev/RPLIDAR',
+                'serial_baudrate': 115200,
+                'frame_id': 'rplidar_link',
+                'inverted': False,
+                'angle_compensate': True,
+        }],
+    )
 
     ld = LaunchDescription(ARGUMENTS)
+    ld.add_action(rplidar_node)
     ld.add_action(param_file_cmd)
     ld.add_action(turtlebot4_node)
     ld.add_action(turtlebot4_base_node)
