@@ -62,7 +62,7 @@ def generate_launch_description():
         name='robot_state_publisher',
         output='screen',
         parameters=[
-            {'use_sim_time': LaunchConfiguration('use_sim_time')},
+            {'use_sim': LaunchConfiguration('use_sim')},
             {'robot_description': Command(
                 ['xacro', ' ', xacro_file, ' ', 'gazebo:=ignition'])},
         ],
