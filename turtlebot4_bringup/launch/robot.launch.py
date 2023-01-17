@@ -24,6 +24,7 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch.substitutions import Command
 from launch_ros.actions import Node
+from launch.substitutions import EnvironmentVariable
 
 
 ARGUMENTS = [
@@ -32,13 +33,14 @@ ARGUMENTS = [
                           description='use_sim'),
     DeclareLaunchArgument('model', default_value='standard',
                           choices=['standard', 'lite'],
-                          description='Turtlebot4 Model')
+                          description='Turtlebot4 Model'),
+
 ]
 
 
 def generate_launch_description():
     # Adding namespace option
-    NAMESPACE = "barista_id"
+    NAMESPACE =  EnvironmentVariable('ROBOT_NAMESPACE', default_value='')
     pkg_turtlebot4_bringup = get_package_share_directory('turtlebot4_bringup')
     pkg_turtlebot4_description = get_package_share_directory(
         'turtlebot4_description')
