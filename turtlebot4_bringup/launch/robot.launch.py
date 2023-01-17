@@ -20,10 +20,9 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch.conditions import LaunchConfigurationEquals
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
-
+from launch.substitutions import Command
 from launch_ros.actions import Node
 
 
@@ -38,12 +37,16 @@ ARGUMENTS = [
 
 
 def generate_launch_description():
-
-    pkg_turtlebot4_bringup = get_package_share_directory('turtlebot4_bringup')
-    pkg_turtlebot4_description = get_package_share_directory('turtlebot4_description')
-
     # Adding namespace option
     NAMESPACE = "barista_id"
+    pkg_turtlebot4_bringup = get_package_share_directory('turtlebot4_bringup')
+    pkg_turtlebot4_description = get_package_share_directory(
+        'turtlebot4_description')
+
+    xacro_file = PathJoinSubstitution([pkg_turtlebot4_description,
+                                       'urdf',
+                                       LaunchConfiguration('model'),
+                                       'turtlebot4.urdf.xacro'])
 
     param_file_cmd = DeclareLaunchArgument(
         'param_file',
@@ -52,13 +55,17 @@ def generate_launch_description():
         description='Turtlebot4 Robot param file'
     )
 
-    description_launch_file = PathJoinSubstitution(
-        [pkg_turtlebot4_description, 'launch', 'robot_description.launch.py']
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[
+            {'use_sim_time': LaunchConfiguration('use_sim_time')},
+            {'robot_description': Command(
+                ['xacro', ' ', xacro_file, ' ', 'gazebo:=ignition'])},
+        ],
     )
-
-    description_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([description_launch_file]),
-        launch_arguments=[('model', 'standard')])
 
     turtlebot4_param_yaml_file = LaunchConfiguration('param_file')
 
@@ -96,7 +103,7 @@ def generate_launch_description():
     )
 
     ld = LaunchDescription(ARGUMENTS)
-    ld.add_action(description_launch)
+    ld.add_action(robot_state_publisher)
     ld.add_action(rplidar_node)
     ld.add_action(param_file_cmd)
     ld.add_action(turtlebot4_node)
