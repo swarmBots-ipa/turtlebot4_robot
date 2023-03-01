@@ -93,6 +93,7 @@ def generate_launch_description():
     rplidar_node = Node(
         name='rplidar_composition',
         package='rplidar_ros',
+        namespace=NAMESPACE,
         executable='rplidar_composition',
         output='screen',
         parameters=[{
