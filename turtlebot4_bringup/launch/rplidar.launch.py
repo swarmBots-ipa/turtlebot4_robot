@@ -18,8 +18,10 @@ from launch import LaunchDescription
 
 from launch_ros.actions import Node
 
+import os
 
 def generate_launch_description():
+    NAMESPACE = os.environ.get('ROBOT_NAMESPACE')
     rplidar_node = Node(
             name='rplidar_composition',
             package='rplidar_ros',
@@ -28,7 +30,7 @@ def generate_launch_description():
             parameters=[{
                 'serial_port': '/dev/RPLIDAR',
                 'serial_baudrate': 115200,
-                'frame_id': 'rplidar_link',
+                'frame_id': str(NAMESPACE)+'/laser_sensor_link',
                 'inverted': False,
                 'angle_compensate': True,
             }],

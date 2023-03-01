@@ -63,7 +63,7 @@ def generate_launch_description():
         name='robot_state_publisher',
         output='screen',
         parameters=[
-	    {'frame_prefix': str(NAMESPACE) +'/'},
+            {'frame_prefix': str(NAMESPACE) + '/'},
             {'use_sim': LaunchConfiguration('use_sim')},
             {'robot_description': Command(
                 ['xacro', ' ', xacro_file, ' ', 'gazebo:=ignition'])},
@@ -94,12 +94,11 @@ def generate_launch_description():
         name='rplidar_composition',
         package='rplidar_ros',
         executable='rplidar_composition',
-        namespace=NAMESPACE,
         output='screen',
         parameters=[{
                 'serial_port': '/dev/RPLIDAR',
                 'serial_baudrate': 115200,
-                'frame_id': 'rplidar_link',
+                'frame_id': str(NAMESPACE)+'/laser_sensor_link',
                 'inverted': False,
                 'angle_compensate': True,
         }],
