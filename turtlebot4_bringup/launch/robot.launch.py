@@ -24,8 +24,7 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch.substitutions import Command
 from launch_ros.actions import Node
-from launch.substitutions import EnvironmentVariable
-
+import os
 
 ARGUMENTS = [
     DeclareLaunchArgument('use_sim', default_value='false',
@@ -40,7 +39,7 @@ ARGUMENTS = [
 
 def generate_launch_description():
     # Adding namespace option
-    NAMESPACE =  EnvironmentVariable('ROBOT_NAMESPACE', default_value='')
+    NAMESPACE = os.environ.get('ROBOT_NAMESPACE')
     pkg_turtlebot4_bringup = get_package_share_directory('turtlebot4_bringup')
     pkg_turtlebot4_description = get_package_share_directory(
         'turtlebot4_description')
@@ -64,6 +63,7 @@ def generate_launch_description():
         name='robot_state_publisher',
         output='screen',
         parameters=[
+	    {'frame_prefix': str(NAMESPACE) +'/'},
             {'use_sim': LaunchConfiguration('use_sim')},
             {'robot_description': Command(
                 ['xacro', ' ', xacro_file, ' ', 'gazebo:=ignition'])},
