@@ -99,7 +99,7 @@ def generate_launch_description():
         parameters=[{
                 'serial_port': '/dev/RPLIDAR',
                 'serial_baudrate': 115200,
-                'frame_id': str(NAMESPACE)+'/laser_sensor_link',
+                'frame_id': str(NAMESPACE)+'/rplidar_link',
                 'inverted': False,
                 'angle_compensate': True,
         }],
